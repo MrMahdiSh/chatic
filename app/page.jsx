@@ -1,21 +1,15 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import Header from "components/ui/header"; // Assuming you have a header component
 import { useState, useEffect } from "react";
 import { requestNotificationPermission } from "../lib/firebase";
-
-const buttonClick = () => {
-  console.log("clicked");
-};
 
 function urlBase64ToUint8Array(base64String) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding)
-    .replace(/\\-/g, "+")
+    .replace(/-/g, "+")
     .replace(/_/g, "/");
 
-  const rawData = window.atob(base64);
+  const rawData = typeof window !== "undefined" ? window.atob(base64) : "";
   const outputArray = new Uint8Array(rawData.length);
 
   for (let i = 0; i < rawData.length; ++i) {
@@ -30,19 +24,21 @@ function PushNotificationManager() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    if ("serviceWorker" in navigator && "PushManager" in window) {
+    if (typeof window !== "undefined" && "serviceWorker" in navigator && "PushManager" in window) {
       setIsSupported(true);
       registerServiceWorker();
     }
   }, []);
 
   async function registerServiceWorker() {
-    const registration = await navigator.serviceWorker.register("/sw.js", {
-      scope: "/",
-      updateViaCache: "none",
-    });
-    const sub = await registration.pushManager.getSubscription();
-    setSubscription(sub);
+    if (typeof navigator !== "undefined" && "serviceWorker" in navigator) {
+      const registration = await navigator.serviceWorker.register("/sw.js", {
+        scope: "/",
+        updateViaCache: "none",
+      });
+      const sub = await registration.pushManager.getSubscription();
+      setSubscription(sub);
+    }
   }
 
   async function subscribeToPush() {
@@ -54,58 +50,43 @@ function PushNotificationManager() {
       ),
     });
     setSubscription(sub);
-    await subscribeUser(sub); // Make sure this function is defined in your context
   }
 
   async function unsubscribeFromPush() {
     await subscription?.unsubscribe();
     setSubscription(null);
-    await unsubscribeUser(); // Make sure this function is defined in your context
   }
 
   async function sendTestNotification() {
     if (subscription) {
-      await sendNotification(message); // Make sure this function is defined in your context
+      await sendNotification(message);
       setMessage("");
     }
   }
 
   if (!isSupported) {
-    return <p className="text-red-500">Push notifications are not supported in this browser.</p>;
+    return <p>Push notifications are not supported in this browser.</p>;
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6 mt-6">
-      <h3 className="text-2xl font-semibold mb-4">Push Notifications</h3>
+    <div>
+      <h3>Push Notifications</h3>
       {subscription ? (
         <>
-          <p className="text-green-600">You are subscribed to push notifications.</p>
-          <button className="mt-2 text-red-600 hover:text-red-800" onClick={unsubscribeFromPush}>
-            Unsubscribe
-          </button>
+          <p>You are subscribed to push notifications.</p>
+          <button onClick={unsubscribeFromPush}>Unsubscribe</button>
           <input
             type="text"
-            className="border border-gray-300 rounded-md p-2 mt-4 w-full"
             placeholder="Enter notification message"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
           />
-          <button
-            className="bg-blue-500 text-white rounded-md px-4 py-2 mt-2 hover:bg-blue-600"
-            onClick={sendTestNotification}
-          >
-            Send Test
-          </button>
+          <button onClick={sendTestNotification}>Send Test</button>
         </>
       ) : (
         <>
-          <p className="text-yellow-600">You are not subscribed to push notifications.</p>
-          <button
-            className="bg-green-500 text-white rounded-md px-4 py-2 mt-2 hover:bg-green-600"
-            onClick={subscribeToPush}
-          >
-            Subscribe
-          </button>
+          <p>You are not subscribed to push notifications.</p>
+          <button onClick={subscribeToPush}>Subscribe</button>
         </>
       )}
     </div>
@@ -117,25 +98,24 @@ function InstallPrompt() {
   const [isStandalone, setIsStandalone] = useState(false);
 
   useEffect(() => {
-    setIsIOS(
-      /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window, any).MSStream
-    );
-
-    setIsStandalone(window.matchMedia("(display-mode: standalone)").matches);
+    if (typeof window !== "undefined") {
+      setIsIOS(
+        /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window, any).MSStream
+      );
+      setIsStandalone(window.matchMedia("(display-mode: standalone)").matches);
+    }
   }, []);
 
   if (isStandalone) {
-    return null; // Don't show install button if already installed
+    return null;
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6 mt-6">
-      <h3 className="text-2xl font-semibold mb-4">Install App</h3>
-      <button className="bg-yellow-500 text-white rounded-md px-4 py-2 hover:bg-yellow-600">
-        Add to Home Screen
-      </button>
+    <div>
+      <h3>Install App</h3>
+      <button>Add to Home Screen</button>
       {isIOS && (
-        <p className="mt-2">
+        <p>
           To install this app on your iOS device, tap the share button
           <span role="img" aria-label="share icon">
             {" "}
@@ -153,20 +133,12 @@ function InstallPrompt() {
   );
 }
 
-const handleClick = () => {
-  requestNotificationPermission();
-};
-
 export default function Page() {
   return (
-    <div className="p-20 bg-gray-100 min-h-screen">
-      <Header />
+    <div className="p-20">
       <PushNotificationManager />
       <InstallPrompt />
-      <button
-        className="bg-blue-500 text-white rounded-md px-4 py-2 mt-4 hover:bg-blue-600"
-        onClick={handleClick}
-      >
+      <button onClick={() => requestNotificationPermission()}>
         Enable Notifications
       </button>
     </div>
