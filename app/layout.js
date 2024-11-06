@@ -6,10 +6,10 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
-
   return (
     <html lang="fa" dir="rtl" suppressHydrationWarning>
       <head>
+        <link rel="manifest" href="/manifest.json" />
         <link
           rel="icon"
           href="/images/logo/Icon.png"
