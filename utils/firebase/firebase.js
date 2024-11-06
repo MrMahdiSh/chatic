@@ -1,7 +1,6 @@
 import { initializeApp } from "firebase/app";
-import { getMessaging } from "firebase/messaging";
 
-export const firebaseConfig = {
+const firebaseConfig = {
   apiKey: "AIzaSyDj2se-SIZORd5UOZE8HRbwjCo1CTg-zeM",
   authDomain: "chatic-1cdcd.firebaseapp.com",
   projectId: "chatic-1cdcd",
@@ -11,9 +10,6 @@ export const firebaseConfig = {
   measurementId: "G-4E81YEB224",
 };
 
-export const app = initializeApp(firebaseConfig);
-let messaging;
-if (typeof window !== "undefined") {
-  messaging = getMessaging(app);
-}
-export { messaging };
+// Initialize Firebase
+const firebaseApp = initializeApp(firebaseConfig);
+export default firebaseApp;

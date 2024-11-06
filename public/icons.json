@@ -1,11 +1,4 @@
 {
-  "name": "PWA App",
-  "short_name": "App",
-  "theme_color": "#FFFFFF",
-  "background_color": "#FFFFFF",
-  "start_url": "/",
-  "display": "standalone",
-  "orientation": "portrait",
   "icons": [
     {
       "src": "windows11/SmallTile.scale-100.png",
@@ -456,5 +449,4 @@
       "sizes": "1024x1024"
     }
   ]
-
 }
