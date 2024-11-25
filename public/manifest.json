@@ -5,6 +5,7 @@
   "background_color": "#FFFFFF",
   "start_url": "/",
   "display": "standalone",
+  "prefer_related_applications": false,
   "orientation": "portrait",
   "icons": [
     {
@@ -456,5 +457,4 @@
       "sizes": "1024x1024"
     }
   ]
-
 }
