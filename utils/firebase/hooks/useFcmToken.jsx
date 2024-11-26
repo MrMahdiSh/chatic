@@ -10,7 +10,6 @@ const useFcmToken = () => {
   useEffect(() => {
     const retrieveToken = async () => {
       try {
-        console.log("overHere");
         if (typeof window !== "undefined" && "serviceWorker" in navigator) {
           const messaging = getMessaging(firebaseApp);
 
